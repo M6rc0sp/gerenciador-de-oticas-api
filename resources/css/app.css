@@ -1,0 +1,209 @@
+@import 'tailwindcss';
+
+/* Styles */
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/* Fixes for layout: ensure main stretches to viewport and footer sits below content */
+.app-main {
+    min-height: 100dvh;
+}
+.app-content {
+    flex: 1 1 auto;
+}
+
+/* Make sure sidebar doesn't overlay content on desktop (adminlte4 classes)
+     and respects the grid spacing */
+.app-sidebar {
+    position: relative;
+}
+
+/* Small helper ensuring footer spacing */
+.app-footer {
+    /* z-index: 1030; */
+}
+
+/* Additional layout enforcement: align with AdminLTE 4 expected layout */
+.app-sidebar {
+    position: relative;
+}
+.app-content {
+    padding: 1rem 0;
+}
+
+/* Ensure topbar items render as a horizontal row (override conflicting CSS) */
+.app-header .navbar-nav {
+    /* Allow Bootstrap to set default behavior; override only on lg+ to ensure row on desktop */
+}
+.app-header .navbar-nav .nav-item {
+    display: flex;
+    align-items: center;
+}
+
+/* ---------------------------------------------------------------------------
+   Fix: Tailwind / other utility defined `.collapse { visibility: collapse }`
+   conflicts with Bootstrap's `.collapse` accordion behavior. Tailwind v4
+   may generate a utility class named `.collapse` (visibility: collapse), which
+   collides with Bootstrap's usage of `.collapse` for accordion panels.
+
+   Scoped override: only force visibility on Bootstrap accordions by targeting
+   `.accordion` container descendants. This avoids impacting other uses of
+   `.collapse` (e.g., table row collapse) while restoring accordion behavior.
+    Note: If your build includes Tailwind or other utility generators, consider
+    using a Tailwind config prefix (e.g., prefix: 'tw-') or disabling specific
+    utilities that collide with Bootstrap (see `tailwind.config.example.js`).
+   ------------------------------------------------------------------------ */
+.accordion .accordion-collapse,
+.accordion .collapse.show {
+    visibility: visible !important;
+}
+
+.app-header .nav-link {
+    padding: .5rem .75rem;
+}
+
+@media (min-width: 992px) {
+    .app-header .navbar-nav {
+        flex-direction: row;
+        align-items: center;
+    }
+}
+
+/* Hide accordion default toggle icon for headers that do not have children */
+.accordion-button.no-children::after {
+    display: none !important;
+}
+
+/* Hide Bootstrap default caret inside our app accordions and replace with a left-side icon */
+.accordion .accordion-button::after {
+    display: none !important;
+}
+
+.accordion-toggle-icon {
+    transition: transform 0.15s ease-in-out;
+    transform-origin: center;
+}
+.accordion-button.collapsed .accordion-toggle-icon {
+    transform: rotate(0deg);
+}
+.accordion-button:not(.collapsed) .accordion-toggle-icon {
+    transform: rotate(90deg);
+}
+.accordion-button.no-children .accordion-toggle-icon {
+    display: none;
+}
+
+/* Style dropdown to be more compact and visually clean */
+.accordion .dropdown .btn {
+    border: 0; /* no border to match clean look */
+    background: transparent;
+}
+
+/* ensure badges align nicely */
+.accordion .badge {
+    font-size: 0.75rem;
+}
+
+/* Remove default caret from dropdown toggles inside accordions */
+.accordion .dropdown-toggle::after {
+    display: none !important;
+}
+
+/* Keep dropdown toggle compact and vertically centered */
+.accordion .dropdown .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.125rem 0.375rem; /* small inline padding */
+    min-width: 2rem;
+}
+
+/* Ensure accordion button grows and leaves the dropdown at the right */
+.accordion .accordion-header .accordion-button {
+    flex: 1 1 auto;
+    min-width: 0; /* prevents overflow */
+}
+
+/* Ensure the dropdown/btn is above the accordion button when hovered/focused */
+.accordion .accordion-header .dropdown,
+.accordion .accordion-header .dropdown .btn,
+.accordion .accordion-header .dropdown .dropdown-menu{
+    /* z-index: 99999 !important; higher than .accordion-button:hover z-index (which is 2) */
+    pointer-events: auto !important; /* ensure clickable */
+}
+
+/* Ensure the dropbtn itself has a stacking context and is not clipped */
+.accordion .accordion-header .dropdown .btn{
+    position: relative;
+}
+/* Uniform left padding for the accordion header button (where chevron sits)
+   reduces the vary between nested levels */
+.accordion .accordion-button {
+    padding-left: 0.6rem; /* tweak to align the chevron consistently */
+    padding-right: 3rem; /* leave space for the action dropdown on the right */
+}
+
+/* Consistent spacing for the left chevron icon */
+.accordion .accordion-toggle-icon {
+    margin-right: 0.5rem; /* ensures consistent spacing between chevron and title */
+}
+
+/* Keep headers aligned: gap between button and dropdown
+    Keep headers aligned and use flexbox so the dropdown sits at right (no absolute required) */
+.accordion .accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem; /* small but consistent spacing on all levels */
+}
+
+/* Force consistent ms-2 on dropdown inside accordion headers */
+.accordion .dropdown.ms-2 {
+    margin-left: 0.35rem !important;
+}
+
+/* Make sure dropdown icon sizes are consistent */
+.accordion .dropdown .btn .bi {
+    font-size: 1rem; /* consistent sizing for the vertical-three-dots icon */
+}
+
+/* Position dropdown to the right edge of the header to standardize X position
+   across nested levels (keeps action menu visually aligned) */
+@media (min-width: 992px) {
+    /* On desktop keep dropdown aligned to right via flexbox. This avoids absolute positioning
+         and the need to override z-index stacking on the button hover. */
+    .accordion .accordion-header { position: static; }
+    .accordion .accordion-header .dropdown { margin-left: auto; position: static; z-index: auto; }
+    .accordion .accordion-header .dropdown .dropdown-menu { z-index: 4; }
+}
+
+/* On smaller screens, keep dropdowns inline and let layout flow naturally */
+@media (max-width: 991.98px) {
+  .accordion .accordion-header {
+      position: static;
+  }
+  .accordion .accordion-header .dropdown {
+      position: static;
+      transform: none !important;
+      right: auto !important;
+      top: auto !important;
+      margin-left: 0.5rem !important; /* small gap to content */
+      display: inline-flex;
+      align-items: center;
+  }
+  .accordion .accordion-button{ padding-right: 0.75rem; } /* smaller padding on mobile */
+}
+
+/* Indentation helper for nested accordion levels: uniform step between levels */
+:root{--accordion-indent-step:.75rem}
+.accordion .indent-step-1{margin-left:var(--accordion-indent-step)!important}
+.accordion .indent-step-2{margin-left:calc(var(--accordion-indent-step)*2)!important}
+.accordion .indent-step-3{margin-left:calc(var(--accordion-indent-step)*3)!important}
