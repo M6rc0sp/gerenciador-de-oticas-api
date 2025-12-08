@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -162,8 +163,8 @@
 
                     <div class="form-group">
                         <label for="name" class="form-label">Nome Completo</label>
-                        <input type="text" class="form-control @error('name') is-invalid @enderror"
-                            id="name" name="name" value="{{ old('name') }}" required autofocus>
+                        <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                            name="name" value="{{ old('name') }}" required autofocus>
                         @error('name')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -171,8 +172,8 @@
 
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror"
-                            id="email" name="email" value="{{ old('email') }}" required>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email" value="{{ old('email') }}" required>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

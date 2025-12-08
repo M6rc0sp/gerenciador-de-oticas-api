@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -123,8 +124,8 @@
 
                     <div class="form-group">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror"
-                            id="email" name="email" value="{{ old('email') }}" required autofocus>
+                        <input type="email" class="form-control @error('email') is-invalid @enderror" id="email"
+                            name="email" value="{{ old('email') }}" required autofocus>
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -144,7 +145,8 @@
 
                 <div style="text-align: center; margin-top: 20px;">
                     <p style="color: #666; margin: 0; font-size: 14px;">
-                        Não tem uma conta? <a href="{{ route('register') }}" style="color: #667eea; text-decoration: none; font-weight: 600;">Registre-se aqui</a>
+                        Não tem uma conta? <a href="{{ route('register') }}"
+                            style="color: #667eea; text-decoration: none; font-weight: 600;">Registre-se aqui</a>
                     </p>
                 </div>
             </div>
