@@ -242,7 +242,7 @@
 
                     // Se mudou de pai, atualizar no servidor
                     if (shouldUpdate && newParentId !== oldParentId) {
-                        updateCategoryParent(categoryId, newParentId);
+                        updateCategoryParent(categoryId, newParentId, item);
                     } else {
                         console.log('❌ Movimento ignorado');
                     }
@@ -250,10 +250,8 @@
             });
         });
 
-        // Função para encontrar o item accordion que está acima de uma posição Y
-        // Procura em TODOS os itens visíveis (incluindo netos, bisnetos, etc)
-        // Função para atualizar o pai da categoria no servidor
-        function updateCategoryParent(categoryId, newParentId) {
+        // Função para atualizar o pai da categoria no servidor (sem recarregar a página)
+        function updateCategoryParent(categoryId, newParentId, categoryElement) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
             fetch(`/categories/${categoryId}/reorder`, {
@@ -277,49 +275,84 @@
                 .then(data => {
                     console.log('✓ Resposta do servidor:', data);
 
-                    // Mostrar mensagem de sucesso
-                    const alert = document.createElement('div');
-                    alert.className = 'alert alert-success alert-dismissible fade show';
-                    alert.setAttribute('role', 'alert');
-                    alert.innerHTML = `
-                <i class="bi bi-check-circle"></i> ${data.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
+                    // Atualizar o DOM com as classes e atributos corretos
+                    updateDOMAfterReorder(categoryElement, newParentId);
 
-                    const container = document.querySelector('.app-content');
-                    container.insertBefore(alert, container.firstChild);
-
-                    // Auto-dismiss em 5 segundos
-                    setTimeout(() => {
-                        alert.classList.remove('show');
-                        alert.addEventListener('transitionend', () => alert.remove(), {
-                            once: true
-                        });
-                    }, 5000);
-
-                    // Recarregar para refletir mudanças visuais
-                    setTimeout(() => {
-                        location.reload();
-                    }, 1500);
+                    showAlert('success', data.message);
                 })
                 .catch(error => {
                     console.error('✗ Erro:', error);
-                    const alert = document.createElement('div');
-                    alert.className = 'alert alert-danger alert-dismissible fade show';
-                    alert.setAttribute('role', 'alert');
-                    alert.innerHTML = `
-                <i class="bi bi-exclamation-circle"></i> ${error.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-
-                    const container = document.querySelector('.app-content');
-                    container.insertBefore(alert, container.firstChild);
-
-                    // Recarregar para reverter
+                    showAlert('danger', error.message);
+                    // Recarregar em caso de erro para reverter o movimento visual
                     setTimeout(() => {
                         location.reload();
                     }, 2000);
                 });
+        }
+
+        // Função para atualizar o DOM após reorder bem-sucedido
+        function updateDOMAfterReorder(categoryElement, newParentId) {
+            // Atualizar data-parent-id
+            if (newParentId) {
+                categoryElement.dataset.parentId = newParentId;
+            } else {
+                categoryElement.removeAttribute('data-parent-id');
+            }
+
+            // Remover classes de indentação antigas
+            categoryElement.classList.remove('indent-step-1', 'indent-step-2');
+            categoryElement.classList.remove('border-0', 'border-top');
+
+            // Determinar o nível de profundidade baseado no novo pai
+            if (!newParentId) {
+                // É um item raiz
+                categoryElement.classList.remove('indent-step-1', 'indent-step-2', 'border-0', 'border-top');
+            } else {
+                // Calcular profundidade
+                let parent = document.querySelector(`[data-category-id="${newParentId}"]`);
+                let depth = 0;
+
+                while (parent) {
+                    const parentId = parent.dataset.parentId;
+                    if (!parentId) break;
+                    depth++;
+                    parent = document.querySelector(`[data-category-id="${parentId}"]`);
+                }
+
+                // Adicionar classes baseado na profundidade
+                categoryElement.classList.add('border-0', 'border-top');
+                if (depth === 0) {
+                    categoryElement.classList.add('indent-step-1');
+                } else if (depth >= 1) {
+                    categoryElement.classList.add('indent-step-2');
+                }
+            }
+
+            // Atualizar o atributo draggable
+            categoryElement.setAttribute('draggable', 'true');
+        }
+
+        // Função auxiliar para mostrar alertas
+        function showAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.setAttribute('role', 'alert');
+            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+            alert.innerHTML = `
+                <i class="bi ${icon}"></i> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+
+            const container = document.querySelector('.app-content');
+            container.insertBefore(alert, container.firstChild);
+
+            // Auto-dismiss em 5 segundos
+            setTimeout(() => {
+                alert.classList.remove('show');
+                alert.addEventListener('transitionend', () => alert.remove(), {
+                    once: true
+                });
+            }, 5000);
         }
     });
 </script>
