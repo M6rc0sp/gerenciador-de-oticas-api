@@ -1,0 +1,40 @@
+module.exports = {
+  apps: [
+    {
+      name: 'gerenciador-oticas-api',
+      script: 'artisan',
+      interpreter: 'php',
+      args: 'serve --host=0.0.0.0 --port=8000',
+      cwd: '/var/www/gerenciador-oticas-api',
+      instances: 1,
+      exec_mode: 'fork',
+      env: {
+        NODE_ENV: 'production',
+        APP_ENV: 'production',
+        APP_KEY: process.env.APP_KEY,
+        DB_CONNECTION: process.env.DB_CONNECTION,
+        DB_HOST: process.env.DB_HOST,
+        DB_PORT: process.env.DB_PORT,
+        DB_DATABASE: process.env.DB_DATABASE,
+        DB_USERNAME: process.env.DB_USERNAME,
+        DB_PASSWORD: process.env.DB_PASSWORD,
+        MAIL_MAILER: process.env.MAIL_MAILER,
+        MAIL_HOST: process.env.MAIL_HOST,
+        MAIL_PORT: process.env.MAIL_PORT,
+        MAIL_USERNAME: process.env.MAIL_USERNAME,
+        MAIL_PASSWORD: process.env.MAIL_PASSWORD,
+        MAIL_ENCRYPTION: process.env.MAIL_ENCRYPTION,
+        MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS,
+        MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
+      },
+      error_file: '/var/log/pm2/gerenciador-oticas-api-error.log',
+      out_file: '/var/log/pm2/gerenciador-oticas-api-out.log',
+      log_file: '/var/log/pm2/gerenciador-oticas-api.log',
+      time: true,
+      watch: false,
+      max_memory_restart: '1G',
+      restart_delay: 4000,
+      autorestart: true,
+    }
+  ]
+};

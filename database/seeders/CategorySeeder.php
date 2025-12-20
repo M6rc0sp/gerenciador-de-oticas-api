@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\CategorySection;
 use App\Models\Category;
 use App\Models\User;
+use App\Models\Store;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -22,9 +23,24 @@ class CategorySeeder extends Seeder
             return;
         }
 
+        // Usar primeira store disponível ou criar uma para seed
+        $store = Store::first();
+        if (! $store) {
+            $store = Store::create([
+                'nuvemshop_id' => 1,
+                'access_token' => 'seed-token',
+                'name' => 'Loja Seed',
+                'email' => 'seed@loja.com',
+                'is_active' => true,
+            ]);
+        }
+
+        $storeId = $store->nuvemshop_id;
+
         // Categoria nível 1: Tipo de Lente (raiz)
         $tipo = Category::create([
             'user_id' => $user->id,
+            'store_id' => $storeId,
             'title' => 'Grau',
             'section' => CategorySection::TIPO->value,
             'id_slug' => 'grau',
@@ -39,6 +55,7 @@ class CategorySeeder extends Seeder
         // Categoria nível 2: Espessura
         $espessura = Category::create([
             'user_id' => $user->id,
+            'store_id' => $storeId,
             'title' => 'Normal',
             'section' => CategorySection::ESPESSURA->value,
             'id_slug' => 'normal-grau',
@@ -54,6 +71,7 @@ class CategorySeeder extends Seeder
         // Categoria nível 3: Produto
         $produto = Category::create([
             'user_id' => $user->id,
+            'store_id' => $storeId,
             'title' => 'Lente Super Resistente',
             'section' => CategorySection::PRODUTO->value,
             'id_slug' => 'lente-super-resistente-normal',
@@ -63,5 +81,7 @@ class CategorySeeder extends Seeder
             'parent_id' => $espessura->id,
             'product' => ['id' => 12345],
         ]);
+
+        echo "✅ Produto criado: {$produto->id_slug}\n";
     }
 }

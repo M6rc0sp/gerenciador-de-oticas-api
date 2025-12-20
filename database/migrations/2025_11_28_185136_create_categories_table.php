@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('store_id')->constrained('stores', 'nuvemshop_id')->onDelete('cascade');
             $table->string('title');
             $table->enum('section', CategorySection::values());
             $table->string('id_slug')->unique();
@@ -23,7 +24,6 @@ return new class extends Migration
             $table->string('brand')->nullable();
             $table->string('help')->nullable();
             $table->enum('next', CategorySection::values())->nullable();
-            // 'parent' enum removed; we now rely on parent_id to relate categories.
             $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade');
             $table->json('product')->nullable();
             $table->timestamps();

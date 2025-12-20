@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
     protected $fillable = [
         'user_id',
+        'store_id',
         'title',
         'section',
         'id_slug',
@@ -21,6 +23,31 @@ class Category extends Model
         'parent_id',
         'product',
     ];
+
+    protected static function booted(): void
+    {
+        // Auto-generate id_slug quando criado ou título é modificado
+        static::creating(function ($model) {
+            if (! $model->id_slug) {
+                $model->id_slug = $model->generateSlug();
+            }
+        });
+
+        // Atualizar slug quando title ou parent_id muda
+        static::saving(function ($model) {
+            if ($model->isDirty(['title', 'parent_id'])) {
+                $model->id_slug = $model->generateSlug();
+            }
+        });
+    }
+
+    /**
+     * Get the route key for the model (uses id_slug for API routes)
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'id_slug';
+    }
 
     protected $casts = [
         'product' => 'json',
@@ -117,5 +144,57 @@ class Category extends Model
         }
 
         return $this->next ? (\App\Enums\CategorySection::options()[$this->next] ?? $this->next) : null;
+    }
+
+    /**
+     * Gera slug automático no formato: "nome-parent_slug" ou apenas "nome" se for root
+     * Também remove "-parent_slug" antigo se estiver mudando de parent
+     */
+    public function generateSlug(): string
+    {
+        $baseSlug = Str::slug($this->title);
+
+        // Se tem parent, append o id_slug do parent
+        if ($this->parent_id) {
+            $parent = Category::find($this->parent_id);
+            if ($parent) {
+                $baseSlug = "{$baseSlug}-{$parent->id_slug}";
+            }
+        }
+
+        // Garantir unicidade na store
+        return $this->ensureUniqueSlug($baseSlug);
+    }
+
+    /**
+     * Garante que o slug seja único dentro da store
+     */
+    private function ensureUniqueSlug(string $slug): string
+    {
+        $query = Category::where('store_id', $this->store_id)
+            ->where('id_slug', $slug);
+
+        // Se é update, exclui o registro atual
+        if ($this->exists) {
+            $query->where('id', '!=', $this->id);
+        }
+
+        if ($query->exists()) {
+            // Adicionar número para tornar único
+            $counter = 1;
+            $newSlug = "{$slug}-{$counter}";
+
+            while (Category::where('store_id', $this->store_id)
+                ->where('id_slug', $newSlug)
+                ->where('id', '!=', $this->id ?? null)
+                ->exists()) {
+                $counter++;
+                $newSlug = "{$slug}-{$counter}";
+            }
+
+            return $newSlug;
+        }
+
+        return $slug;
     }
 }
