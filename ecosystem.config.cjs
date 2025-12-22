@@ -5,7 +5,7 @@ module.exports = {
             script: 'artisan',
             interpreter: 'php',
             // Use 0.0.0.0 and a non-standard port to be proxied by Apache
-            args: 'serve --host=0.0.0.0 --port=' + (process.env.PORT || 10002),
+            args: ['serve', '--host=0.0.0.0', '--port=${PORT||10002}'],
             // Keep the app where it already lives on the droplet
             cwd: process.env.APP_CWD || '/home/documents/mvl/gerenciador-de-oticas-api',
             instances: 1,
