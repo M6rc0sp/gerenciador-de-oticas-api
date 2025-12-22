@@ -1,11 +1,13 @@
 module.exports = {
   apps: [
     {
-      name: 'gerenciador-oticas-api',
+      name: process.env.PM2_APP_NAME || 'gerenciador-oticas-api',
       script: 'artisan',
       interpreter: 'php',
-      args: 'serve --host=0.0.0.0 --port=8000',
-      cwd: '/var/www/gerenciador-oticas-api',
+      // Use 127.0.0.1 and a non-standard port to be proxied by Apache
+      args: `serve --host=127.0.0.1 --port=${process.env.PORT || 10002}`,
+      // Keep the app where it already lives on the droplet
+      cwd: process.env.APP_CWD || '/home/documents/mvl/gerenciador-de-oticas-api',
       instances: 1,
       exec_mode: 'fork',
       env: {
@@ -27,9 +29,9 @@ module.exports = {
         MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS,
         MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
       },
-      error_file: '/var/log/pm2/gerenciador-oticas-api-error.log',
-      out_file: '/var/log/pm2/gerenciador-oticas-api-out.log',
-      log_file: '/var/log/pm2/gerenciador-oticas-api.log',
+      error_file: process.env.PM2_ERROR_LOG || '/home/documents/mvl/gerenciador-de-oticas-api/logs/error.log',
+      out_file: process.env.PM2_OUT_LOG || '/home/documents/mvl/gerenciador-de-oticas-api/logs/out.log',
+      log_file: process.env.PM2_COMBINED_LOG || '/home/documents/mvl/gerenciador-de-oticas-api/logs/combined.log',
       time: true,
       watch: false,
       max_memory_restart: '1G',

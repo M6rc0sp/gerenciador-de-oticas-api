@@ -6,74 +6,67 @@
 set -e
 
 ENVIRONMENT=${1:-production}
-PROJECT_DIR="/var/www/gerenciador-oticas-api"
-BACKUP_DIR="/var/backups/gerenciador-oticas-api"
+TARGET_DIR="/home/documents/mvl/gerenciador-de-oticas-api"
+PM2_APP_NAME=${PM2_APP_NAME:-gerenciador-oticas-api}
+PORT=${PORT:-10002} # default non-standard port (override via env)
 
 echo "🚀 Iniciando deploy para $ENVIRONMENT..."
 
-# Criar diretórios necessários
-sudo mkdir -p $PROJECT_DIR
-sudo mkdir -p $BACKUP_DIR
-sudo mkdir -p /var/log/pm2
-
-# Backup se existir
-if [ -d "$PROJECT_DIR/.git" ]; then
-    echo "📦 Fazendo backup..."
-    sudo cp -r $PROJECT_DIR $BACKUP_DIR/$(date +%Y%m%d_%H%M%S)
+# Verificar se o diretório do app existe (não vamos mover ele)
+if [ ! -d "$TARGET_DIR" ]; then
+    echo "❌ Diretório $TARGET_DIR não encontrado. Coloque o projeto nesse caminho no droplet e rode novamente." >&2
+    exit 1
 fi
 
-# Clonar/Atualizar código
-if [ ! -d "$PROJECT_DIR/.git" ]; then
-    echo "📥 Clonando repositório..."
-    sudo git clone https://github.com/M6rc0sp/gerenciador-de-oticas-api.git $PROJECT_DIR
-    cd $PROJECT_DIR
-else
-    echo "🔄 Atualizando código..."
-    cd $PROJECT_DIR
-    sudo git pull origin main
-fi
+cd "$TARGET_DIR"
 
-# Instalar dependências PHP
+echo "🔄 Atualizando código (pull)..."
+git pull origin main || true
+
 echo "📦 Instalando dependências PHP..."
-sudo composer install --no-dev --optimize-autoloader
+composer install --no-dev --optimize-autoloader
 
-# Instalar dependências Node.js
-echo "📦 Instalando dependências Node.js..."
-sudo npm ci
-sudo npm run build
+echo "📦 Instalando dependências Node.js e build..."
+npm ci
+npm run build
 
-# Configurar ambiente
-echo "⚙️  Configurando ambiente..."
+echo "⚙️  Verificando .env..."
 if [ ! -f ".env" ]; then
-    sudo cp .env.example .env
-    echo "❗ Configure o arquivo .env com suas credenciais!"
+    cp .env.example .env
+    echo "❗ Copiado .env.example → .env. Edite .env com as credenciais (DB, APP_KEY, etc)."
 fi
 
-# Gerar chave da aplicação
-sudo php artisan key:generate
+# Gerar chave da aplicação se não existir
+if ! grep -q '^APP_KEY=' .env || [ -z "$(grep '^APP_KEY=' .env | cut -d'=' -f2)" ]; then
+    php artisan key:generate
+fi
 
-# Executar migrações
-sudo php artisan migrate --force
+echo "➡️  Rodando migrações (se necessário)..."
+php artisan migrate --force || true
 
-# Limpar caches
-sudo php artisan config:cache
-sudo php artisan route:cache
-sudo php artisan view:cache
+echo "🧹 Limpando caches..."
+php artisan config:cache || true
+php artisan route:cache || true
+php artisan view:cache || true
 
-# Configurar permissões
-sudo chown -R www-data:www-data $PROJECT_DIR
-sudo chmod -R 755 $PROJECT_DIR/storage
-sudo chmod -R 755 $PROJECT_DIR/bootstrap/cache
+# Criar pasta de logs local para PM2
+mkdir -p "$TARGET_DIR/logs"
 
-# Reiniciar aplicação com PM2
-echo "🔄 Reiniciando aplicação..."
-cd $PROJECT_DIR
-sudo pm2 stop gerenciador-oticas-api || true
-sudo pm2 delete gerenciador-oticas-api || true
-sudo pm2 start ecosystem.config.js --env $ENVIRONMENT
-sudo pm2 save
+echo "🔄 Reiniciando/ligando a app via PM2 (nome: $PM2_APP_NAME, port: $PORT)..."
+# Exportar variáveis que o ecosystem.config.js lê
+export PORT="$PORT"
+export APP_CWD="$TARGET_DIR"
+export PM2_APP_NAME="$PM2_APP_NAME"
+
+# Reiniciar com PM2 usando o nome configurado
+pm2 stop "$PM2_APP_NAME" || true
+pm2 delete "$PM2_APP_NAME" || true
+pm2 start ecosystem.config.js --env "$ENVIRONMENT"
+pm2 save
 
 echo "✅ Deploy concluído!"
-echo "🌐 Aplicação rodando em: http://seu-droplet-ip:8000"
+echo "🌐 Aplicação pronta para proxy reverso em: http://127.0.0.1:$PORT"
 echo "📊 Verificar status: pm2 status"
-echo "📝 Ver logs: pm2 logs gerenciador-oticas-api"
+echo "📝 Ver logs: pm2 logs $PM2_APP_NAME"
+
+echo "📌 Lembrete: atualize a VirtualHost/Proxy do Apache para apontar o host correto para http://127.0.0.1:$PORT"
