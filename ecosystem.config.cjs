@@ -12,6 +12,8 @@ module.exports = {
             exec_mode: 'fork',
             env: {
                 NODE_ENV: 'production',
+                APP_URL: process.env.APP_URL || 'https://appfiltree-api.mvlco.com.br',
+                PORT: process.env.PORT || '10002',
                 APP_ENV: 'production',
                 APP_KEY: process.env.APP_KEY,
                 DB_CONNECTION: process.env.DB_CONNECTION,
