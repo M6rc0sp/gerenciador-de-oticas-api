@@ -15,11 +15,15 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie', 'ns/*'],
+    'paths' => ['api/*', 'ns/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => [
+        'https://appfiltree.mvlco.com.br',
+        'http://localhost:3000',
+        'http://localhost:5173',
+    ],
 
     'allowed_origins_patterns' => [],
 
