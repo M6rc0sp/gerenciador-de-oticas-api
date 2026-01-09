@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Registrar TrustProxies para reconhecer X-Forwarded-* do Apache
         $middleware->trustProxies(at: '*');
 
+        // Registrar middleware CORS
+        $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
+
         $middleware->validateCsrfTokens(except: [
             'api/*',
         ]);
