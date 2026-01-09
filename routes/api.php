@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NuvemshopController;
 use Illuminate\Support\Facades\Route;
+
+// Rota de instalação do app Nuvemshop (pública, sem autenticação)
+Route::get('/ns/install', [NuvemshopController::class, 'install']);
 
 // Rotas protegidas por autenticação Nexo
 Route::get('/{store_id}/categories', [CategoryController::class, 'apiIndex']);

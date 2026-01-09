@@ -2,7 +2,11 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\NuvemshopController;
 use Illuminate\Support\Facades\Route;
+
+// Rota de instalação do app Nuvemshop (pública, sem autenticação)
+Route::get('/ns/install', [NuvemshopController::class, 'install'])->name('nuvemshop.install');
 
 // Rotas de autenticação (públicas)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
