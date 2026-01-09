@@ -13,14 +13,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // CORS deve estar no topo (prepend para ser processado primeiro)
+        $middleware->prepend(\Illuminate\Http\Middleware\HandleCors::class);
+
         // Registrar TrustProxies para reconhecer X-Forwarded-* do Apache
         $middleware->trustProxies(at: '*');
 
-        // Registrar middleware CORS
-        $middleware->append(\Illuminate\Http\Middleware\HandleCors::class);
-
+        // Excluir preflight OPTIONS e rotas de API do CSRF
         $middleware->validateCsrfTokens(except: [
             'api/*',
+            'ns/*',
         ]);
 
         // Registrar alias para middleware de autenticação Nexo
