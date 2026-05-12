@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Registrar - Gerenciador de Óticas</title>
+    <title>Registrar - Meu Filtro</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         html,

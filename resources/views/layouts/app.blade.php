@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title') - Gerenciador de Óticas</title>
+    <title>@yield('title') - Meu Filtro</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @yield('styles')
 </head>
@@ -134,7 +134,7 @@
             <footer class="app-footer border-top bg-body-tertiary">
                 <div class="container-fluid py-2">
                     <div class="row">
-                        <div class="col-md-6 text-muted">© {{ date('Y') }} Gerenciador de Óticas</div>
+                        <div class="col-md-6 text-muted">© {{ date('Y') }} Meu Filtro</div>
                         <div class="col-md-6 text-end small">v0.1</div>
                     </div>
                 </div>
