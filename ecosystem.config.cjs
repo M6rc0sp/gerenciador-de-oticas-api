@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
     apps: [
         {
             name: process.env.PM2_APP_NAME || 'gerenciador-oticas-api',
@@ -7,7 +7,7 @@ module.exports = {
             // Use 0.0.0.0 and a non-standard port to be proxied by Apache
             args: ['serve', '--host=0.0.0.0', '--port=${PORT||10002}'],
             // Keep the app where it already lives on the droplet
-            cwd: process.env.APP_CWD || '/home/documents/mvl/gerenciador-de-oticas-api',
+            cwd: process.env.APP_CWD || '/home/documents/mvl/ns-meu-filtro-api',
             instances: 1,
             exec_mode: 'fork',
             env: {
@@ -31,9 +31,9 @@ module.exports = {
                 MAIL_FROM_ADDRESS: process.env.MAIL_FROM_ADDRESS,
                 MAIL_FROM_NAME: process.env.MAIL_FROM_NAME,
             },
-            error_file: process.env.PM2_ERROR_LOG || '/home/documents/mvl/gerenciador-de-oticas-api/logs/error.log',
-            out_file: process.env.PM2_OUT_LOG || '/home/documents/mvl/gerenciador-de-oticas-api/logs/out.log',
-            log_file: process.env.PM2_COMBINED_LOG || '/home/documents/mvl/gerenciador-de-oticas-api/logs/combined.log',
+            error_file: process.env.PM2_ERROR_LOG || '/home/documents/mvl/ns-meu-filtro-api/logs/error.log',
+            out_file: process.env.PM2_OUT_LOG || '/home/documents/mvl/ns-meu-filtro-api/logs/out.log',
+            log_file: process.env.PM2_COMBINED_LOG || '/home/documents/mvl/ns-meu-filtro-api/logs/combined.log',
             time: true,
             watch: false,
             max_memory_restart: '1G',

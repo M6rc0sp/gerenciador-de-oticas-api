@@ -4,15 +4,13 @@ namespace App\Enums;
 
 enum CategorySection: string
 {
-    case TIPO = 'tipo';
-    case ESPESSURA = 'espessura';
+    case FILTRO = 'filtro';
     case PRODUTO = 'produto';
 
     public function label(): string
     {
         return match($this) {
-            self::TIPO => 'Tipo',
-            self::ESPESSURA => 'Espessura',
+            self::FILTRO => 'Filtro',
             self::PRODUTO => 'Produto',
         };
     }

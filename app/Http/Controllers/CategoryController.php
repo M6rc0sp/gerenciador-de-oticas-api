@@ -170,10 +170,10 @@ class CategoryController extends Controller
         if ($newParentId) {
             $parentCategory = Category::find($newParentId);
             // Se o pai tem um "próximo" tipo definido, a categoria herda esse tipo
-            $category->section = $parentCategory?->next ?? CategorySection::TIPO;
+            $category->section = $parentCategory?->next ?? CategorySection::FILTRO;
         } else {
-            // Se não tem pai, é uma categoria raiz = TIPO
-            $category->section = CategorySection::TIPO;
+            // Se não tem pai, é uma categoria raiz = FILTRO
+            $category->section = CategorySection::FILTRO;
         }
 
         // Atualizar parent_id e section
@@ -453,9 +453,9 @@ class CategoryController extends Controller
             // Atualizar seção
             if ($newParentId) {
                 $parentCategory = Category::find($newParentId);
-                $category->section = $parentCategory?->next ?? CategorySection::TIPO;
+                $category->section = $parentCategory?->next ?? CategorySection::FILTRO;
             } else {
-                $category->section = CategorySection::TIPO;
+                $category->section = CategorySection::FILTRO;
             }
 
             // Ao atualizar parent_id, o slug será regenerado automaticamente pelo model

@@ -37,48 +37,32 @@ class CategorySeeder extends Seeder
 
         $storeId = $store->nuvemshop_id;
 
-        // Categoria nível 1: Tipo de Lente (raiz)
-        $tipo = Category::create([
+        // Categoria nível 1: Filtro (raiz)
+        $filtro = Category::create([
             'user_id' => $user->id,
             'store_id' => $storeId,
-            'title' => 'Grau',
-            'section' => CategorySection::TIPO->value,
-            'id_slug' => 'grau',
-            'description' => 'Classificação de acordo com o grau de prescrição',
+            'title' => 'Linha X',
+            'section' => CategorySection::FILTRO->value,
+            'id_slug' => 'linha-x',
+            'description' => 'Linha x do filtro',
             'icon' => 'http://apps.mvlco.com.br/oticafamilia/wp-content/uploads/2025/11/icon_tipo.png',
-            'next' => CategorySection::ESPESSURA->value,
-            'product' => ['id' => null],
-        ]);
-
-        echo "✅ Tipo criado: {$tipo->id_slug}\n";
-
-        // Categoria nível 2: Espessura
-        $espessura = Category::create([
-            'user_id' => $user->id,
-            'store_id' => $storeId,
-            'title' => 'Normal',
-            'section' => CategorySection::ESPESSURA->value,
-            'id_slug' => 'normal-grau',
-            'description' => "Miopia\nde 0 a -2 graus\n\nHipermetropia\nde 0 a +2 graus\n\nAstigmatismo\nde 0 a -2 graus\n",
-            'icon' => 'http://apps.mvlco.com.br/oticafamilia/wp-content/uploads/2025/11/icon_normal.png',
             'next' => CategorySection::PRODUTO->value,
-            'parent_id' => $tipo->id,
             'product' => ['id' => null],
         ]);
 
-        echo "✅ Espessura criada: {$espessura->id_slug}\n";
+        echo "✅ Filtro criado: {$filtro->id_slug}\n";
 
-        // Categoria nível 3: Produto
+        // Categoria nível 2: Produto
         $produto = Category::create([
             'user_id' => $user->id,
             'store_id' => $storeId,
-            'title' => 'Lente Super Resistente',
+            'title' => 'Produto X',
             'section' => CategorySection::PRODUTO->value,
-            'id_slug' => 'lente-super-resistente-normal',
-            'description' => 'Lente com tratamento especial',
+            'id_slug' => 'produto-x',
+            'description' => 'Produto X do filtro X',
             'icon' => 'http://apps.mvlco.com.br/oticafamilia/wp-content/uploads/2025/11/icon_produto.png',
             'next' => null,
-            'parent_id' => $espessura->id,
+            'parent_id' => $filtro->id,
             'product' => ['id' => 12345],
         ]);
 
