@@ -1,4 +1,4 @@
-﻿module.exports = {
+module.exports = {
     apps: [
         {
             name: process.env.PM2_APP_NAME || 'gerenciador-oticas-api',
